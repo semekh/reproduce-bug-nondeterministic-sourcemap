@@ -2,6 +2,8 @@ import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack";
 
+const USE_V1 = process.env.USE_V1 === "1";
+
 const options = {
   name: "federation_provider",
   exposes: {
@@ -19,11 +21,13 @@ export default defineConfig({
     },
   },
 
+  moduleFederation: USE_V1 ? { options: options } : null,
+
   tools: {
     rspack: (config, { appendPlugins }) => {
-      // You need to set a unique value that is not equal to other applications
-      // config.output!.uniqueName = "federation_provider";
-      appendPlugins([new ModuleFederationPlugin(options)]);
+      if(!USE_V1) {
+        appendPlugins([new ModuleFederationPlugin(options)]);
+      }
     },
   },
 });
